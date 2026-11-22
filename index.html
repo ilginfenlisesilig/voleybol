@@ -202,7 +202,7 @@
     <div class="tournament-container" id="tournamentTree"></div>
 
     <script>
-        let m_data = {
+        var m_data = {
             'R1_1': { takim1: '9-B', takim2: '11-A', skor: '-', tarih: '23 Kasım Pazartesi', hakem: 'Fatih Teper' },
             'R1_2': { takim1: '9-A', takim2: '12-A', skor: '-', tarih: '24 Kasım Salı', hakem: 'Fatih Teper' },
             'R1_3': { takim1: '10-B', takim2: '11-B', skor: '-', tarih: '26 Kasım Perşembe', hakem: 'Fatih Teper' },
@@ -212,28 +212,78 @@
         };
 
         function parsePair(pairStr, index) {
-            try {
-                if (!pairStr || pairStr === '-') return '-';
-                const parts = String(pairStr).split('-');
-                if (parts.length >= 2) {
-                    const val = parts[index].trim();
-                    return val !== '' ? val : '-';
-                }
-            } catch (e) {}
+            if (!pairStr || pairStr === '-') return '-';
+            var parts = String(pairStr).split('-');
+            if (parts.length >= 2) {
+                var val = parts[index].trim();
+                return val !== '' ? val : '-';
+            }
             return '-';
         }
 
-        function createMatchHTML(code, labelText, isFinal = false) {
-            const data = m_data[code] || { takim1: '-', takim2: '-', skor: '-', tarih: '-', hakem: '-' };
-            const s1 = parsePair(data.skor, 0);
-            const s2 = parsePair(data.skor, 1);
+        function createMatchHTML(code, labelText, isFinal) {
+            var data = m_data[code] || { takim1: '-', takim2: '-', skor: '-', tarih: '-', hakem: '-' };
+            var s1 = parsePair(data.skor, 0);
+            var s2 = parsePair(data.skor, 1);
 
-            const s1Class = s1 !== '-' ? 'team-score has-score' : 'team-score';
-            const s2Class = s2 !== '-' ? 'team-score has-score' : 'team-score';
-            const refereeName = data.hakem && data.hakem !== '-' ? data.hakem : 'Atanmadı';
+            var s1Class = s1 !== '-' ? 'team-score has-score' : 'team-score';
+            var s2Class = s2 !== '-' ? 'team-score has-score' : 'team-score';
+            var refereeName = data.hakem && data.hakem !== '-' ? data.hakem : 'Atanmadı';
 
-            const numS1 = Number(s1);
-            const numS2 = Number(s2);
-            const hasValidScores = s1 !== '-' && s2 !== '-' && !Number.isNaN(numS1) && !Number.isNaN(numS2);
+            var numS1 = parseFloat(s1);
+            var numS2 = parseFloat(s2);
+            var hasValidScores = s1 !== '-' && s2 !== '-' && !isNaN(numS1) && !isNaN(numS2);
 
-            const team1Wins = hasValidScores &&
+            var team1Wins = hasValidScores && numS1 > numS2;
+            var team2Wins = hasValidScores && numS2 > numS1;
+
+            var badgeLabel = isFinal ? 'ŞAMPİYON' : 'TUR';
+            var win1Badge = team1Wins ? '<span class="winner-badge">' + badgeLabel + '</span>' : '';
+            var win2Badge = team2Wins ? '<span class="winner-badge">' + badgeLabel + '</span>' : '';
+
+            return (
+                '<div class="match-wrapper">' +
+                    '<div class="match-label">' + labelText + '</div>' +
+                    '<div class="match-card ' + (isFinal ? 'final-card' : '') + '">' +
+                        '<div class="match-header">' + (data.tarih || code) + '</div>' +
+                        '<div class="team-row ' + (team1Wins ? 'winner-row' : '') + '">' +
+                            '<span class="team-name">' + (data.takim1 || '-') + ' ' + win1Badge + '</span>' +
+                            '<span class="score-group"><span class="' + s1Class + '">' + s1 + '</span></span>' +
+                        '</div>' +
+                        '<div class="team-row ' + (team2Wins ? 'winner-row' : '') + '">' +
+                            '<span class="team-name">' + (data.takim2 || '-') + ' ' + win2Badge + '</span>' +
+                            '<span class="score-group"><span class="' + s2Class + '">' + s2 + '</span></span>' +
+                        '</div>' +
+                        '<div class="match-footer-referee">Hakem: <span>' + refereeName + '</span></div>' +
+                    '</div>' +
+                '</div>'
+            );
+        }
+
+        function renderTree() {
+            var container = document.getElementById('tournamentTree');
+            if (!container) return;
+
+            container.innerHTML =
+                '<div class="round-column">' +
+                    '<div class="round-title">1. Tur</div>' +
+                    createMatchHTML('R1_1', '1. Maç', false) +
+                    createMatchHTML('R1_2', '2. Maç', false) +
+                    createMatchHTML('R1_3', '3. Maç', false) +
+                '</div>' +
+                '<div class="round-column">' +
+                    '<div class="round-title">Yarı Finaller</div>' +
+                    createMatchHTML('SF1', '1. Yarı Final', false) +
+                    createMatchHTML('SF2', '2. Yarı Final', false) +
+                '</div>' +
+                '<div class="round-column">' +
+                    '<div class="round-title">Final</div>' +
+                    createMatchHTML('FINAL', 'Büyük Final', true) +
+                '</div>';
+        }
+
+        document.addEventListener('DOMContentLoaded', renderTree);
+        renderTree();
+    </script>
+</body>
+</html>
