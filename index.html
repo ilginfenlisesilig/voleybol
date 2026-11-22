@@ -1,178 +1,239 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IFL Okul Ligi 2. Devre Fikstür</title>
-  <style>
-    body {
-      font-family: "Inter", sans-serif;
-      background-color: #111;
-      color: #eaeaea;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFL Voleybol Turnuva Ağacı</title>
+    <style>
+        :root {
+            --bg-color: #0b0b0b;
+            --card-bg: rgba(24, 24, 24, 0.9);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --gold: #ff6a00;
+            --gold-glow: rgba(255, 106, 0, 0.35);
+            --text-main: #ffffff;
+            --text-muted: #b0b0b0;
+        }
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 25px;
-      color: #f1f1f1;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    #tables-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 25px;
-      width: 100%;
-    }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            background-image: radial-gradient(circle at 50% 0%, rgba(255, 106, 0, 0.14) 0%, var(--bg-color) 65%);
+        }
 
-    .table-wrapper {
-      width: 100%;
-      max-width: 800px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
+        h1 {
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            text-align: center;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255, 106, 0, 0.25);
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+        }
 
-    table {
-      table-layout: fixed;
-      border-collapse: collapse;
-      width: 100%;
-      background: #1a1a1a;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-      min-width: 450px;
-      margin: 0 auto;
-    }
+        .tournament-container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            align-items: flex-start;
+            max-width: 1200px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
 
-    th, td {
-      padding: 12px 8px;
-      border-bottom: 1px solid #333;
-      text-align: center;
-      white-space: nowrap;
-      box-sizing: border-box;
-    }
+        .round-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+            min-width: 280px;
+            align-items: center;
+        }
 
-    /* Sütun genişlikleri görseldeki hiyerarşiye göre ayarlandı */
-    th:nth-child(1), td:nth-child(1) { width: 20%; } /* Tarih */
-    th:nth-child(2), td:nth-child(2) { width: 30%; font-weight: bold; } /* Ev Sahibi */
-    th:nth-child(3), td:nth-child(3) { width: 30%; font-weight: bold; } /* Deplasman */
-    th:nth-child(4), td:nth-child(4) { width: 20%; color: #ffcc00; } /* Skor */
+        .round-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
 
-    th {
-      background: #222;
-      color: #ccc;
-      text-transform: uppercase;
-      font-size: 13px;
-      letter-spacing: 1px;
-    }
+        .match-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-    td {
-      color: #ddd;
-      font-size: 14px;
-    }
+        .match-label {
+            font-size: 0.8rem;
+            color: var(--gold);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-left: 4px;
+            text-transform: uppercase;
+        }
 
-    tr:nth-child(even) {
-      background: #181818;
-    }
+        .match-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 100%;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
 
-    tr:hover {
-      background: #2a2a2a;
-      transition: 0.2s ease;
-    }
+        .match-card:hover {
+            border-color: rgba(255, 106, 0, 0.45);
+            transform: translateY(-2px);
+        }
 
-    .loading {
-      font-style: italic;
-      color: #888;
-    }
+        .match-card.final-card {
+            border: 1px solid var(--gold);
+            box-shadow: 0 0 25px var(--gold-glow);
+        }
 
-    @media (max-width: 600px) {
-      body { padding: 10px; }
-      h1 { font-size: 18px; }
-      th, td { padding: 10px 5px; font-size: 12px; }
-      table { min-width: 350px; }
-    }
-  </style>
+        .match-header {
+            background: rgba(0, 0, 0, 0.28);
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 0.5px;
+        }
+
+        .team-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: background 0.2s ease;
+        }
+
+        .team-row.winner-row {
+            background: rgba(255, 106, 0, 0.11);
+            font-weight: 600;
+        }
+
+        .team-row:not(:last-child) {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .team-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .winner-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #ff8529;
+            border: 1px solid rgba(255, 106, 0, 0.5);
+            background: rgba(255, 106, 0, 0.14);
+            padding: 1px 5px;
+            border-radius: 4px;
+            letter-spacing: 0.4px;
+        }
+
+        .score-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .team-score {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            min-width: 32px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .team-score.has-score {
+            border-color: var(--gold);
+            color: #ff8529;
+            background: rgba(255, 106, 0, 0.1);
+        }
+
+        .match-footer-referee {
+            background: rgba(0, 0, 0, 0.35);
+            border-top: 1px solid var(--border-color);
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .match-footer-referee span {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
 
-  <h1>IFL OKUL LİGİ 2. DEVRE FİKSTÜR</h1>
+    <h1>IFL VOLEYBOL TURNUVA AĞACI</h1>
 
-  <div id="tables-container">
-    <p class="loading">Fikstür güncelleniyor...</p>
-  </div>
+    <div class="tournament-container" id="tournamentTree"></div>
 
-  <script>
-    // Google Sheet ID'niz (Aynı bıraktım)
-    const sheetId = "1MhE3AWvNAFi3RWXYZNGLuXF62s6UgaUMEZyAxgOw3Og";
-    const gid = "0";
-    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+    <script>
+        let m_data = {
+            'R1_1': { takim1: '9-B', takim2: '11-A', skor: '-', tarih: '23 Kasım Pazartesi', hakem: 'Fatih Teper' },
+            'R1_2': { takim1: '9-A', takim2: '12-A', skor: '-', tarih: '24 Kasım Salı', hakem: 'Fatih Teper' },
+            'R1_3': { takim1: '10-B', takim2: '11-B', skor: '-', tarih: '26 Kasım Perşembe', hakem: 'Fatih Teper' },
+            'SF1':  { takim1: '23 Kasım Galibi', takim2: '24 Kasım Galibi', skor: '-', tarih: '30 Kasım Pazartesi', hakem: 'Fatih Teper' },
+            'SF2':  { takim1: '10-B / 11-B Galibi', takim2: '10-A', skor: '-', tarih: '1 Aralık Salı', hakem: 'Fatih Teper' },
+            'FINAL':{ takim1: 'Yarı Final 1 Galibi', takim2: 'Yarı Final 2 Galibi', skor: '-', tarih: '3 Aralık Perşembe', hakem: 'Fatih Teper' }
+        };
 
-    async function loadFixture() {
-      try {
-        const res = await fetch(csvUrl);
-        const text = await res.text();
-        
-        // Satırları ayır ve boş satırları temizle
-        const rows = text.split("\n")
-                         .map(r => r.split(","))
-                         .filter(row => row[0].trim() !== "");
+        function parsePair(pairStr, index) {
+            try {
+                if (!pairStr || pairStr === '-') return '-';
+                const parts = String(pairStr).split('-');
+                if (parts.length >= 2) {
+                    const val = parts[index].trim();
+                    return val !== '' ? val : '-';
+                }
+            } catch (e) {}
+            return '-';
+        }
 
-        const container = document.getElementById("tables-container");
-        container.innerHTML = "";
+        function createMatchHTML(code, labelText, isFinal = false) {
+            const data = m_data[code] || { takim1: '-', takim2: '-', skor: '-', tarih: '-', hakem: '-' };
+            const s1 = parsePair(data.skor, 0);
+            const s2 = parsePair(data.skor, 1);
 
-        const wrapper = document.createElement("div");
-        wrapper.className = "table-wrapper";
+            const s1Class = s1 !== '-' ? 'team-score has-score' : 'team-score';
+            const s2Class = s2 !== '-' ? 'team-score has-score' : 'team-score';
+            const refereeName = data.hakem && data.hakem !== '-' ? data.hakem : 'Atanmadı';
 
-        const table = document.createElement("table");
-        const thead = document.createElement("thead");
-        const tbody = document.createElement("tbody");
+            const numS1 = Number(s1);
+            const numS2 = Number(s2);
+            const hasValidScores = s1 !== '-' && s2 !== '-' && !Number.isNaN(numS1) && !Number.isNaN(numS2);
 
-        // Başlık Satırı (TARİH, EV SAHİBİ, DEPLASMAN, SKOR)
-        const headerRow = document.createElement("tr");
-        const headers = ["TARİH", "EV SAHİBİ", "DEPLASMAN", "SKOR"];
-        
-        headers.forEach(text => {
-          const th = document.createElement("th");
-          th.textContent = text;
-          headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-
-        // Veri Satırları (Sheets'teki ilk 4 sütunu çeker)
-        // Eğer Sheets'te başlık satırı varsa slice(1) yapın, yoksa slice(0)
-        rows.slice(1).forEach((row) => {
-          const tr = document.createElement("tr");
-          
-          // Sadece ilk 4 sütunu al (Tarih, Ev, Deplasman, Skor)
-          for (let i = 0; i < 4; i++) {
-            const td = document.createElement("td");
-            td.textContent = (row[i] || "").trim();
-            tr.appendChild(td);
-          }
-          tbody.appendChild(tr);
-        });
-
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        wrapper.appendChild(table);
-        container.appendChild(wrapper);
-
-      } catch (err) {
-        document.getElementById("tables-container").innerHTML = "⚠️ Veri çekilirken bir hata oluştu: " + err.message;
-      }
-    }
-
-    // İlk yükleme
-    loadFixture();
-    
-    // 60 saniyede bir otomatik yenileme
-    setInterval(loadFixture, 60000);
-  </script>
-
-</body>
-</html>
+            const team1Wins = hasValidScores &&
